@@ -1,0 +1,76 @@
+library(readr)
+library(plyr)
+
+pop <- read_csv("/Users/Erik/Desktop/Topics In Cinema Project/TC_PROJ/2013-american-community-survey/pums/ss13pusa.csv")
+
+
+#Parsing Data
+
+# industry mappings
+indCode <- as.integer(c(170L, 180L, 190L, 270L, 280L, 290L, 370L, 
+                        380L, 390L, 470L, 490L, 570L, 580L, 590L, 670L, 680L, 690L, 770L, 
+                        1070L, 1080L, 1090L, 1170L, 1180L, 1190L, 1270L, 1280L, 1290L, 
+                        1370L, 1390L, 1470L, 1480L, 1490L, 1570L, 1590L, 1670L, 1680L, 
+                        1690L, 1770L, 1790L, 1870L, 1880L, 1890L, 1990L, 2070L, 2090L, 
+                        2170L, 2180L, 2190L, 2270L, 2280L, 2290L, 2370L, 2380L, 2390L, 
+                        2470L, 2480L, 2490L, 2570L, 2590L, 2670L, 2680L, 2690L, 2770L, 
+                        2780L, 2790L, 2870L, 2880L, 2890L, 2970L, 2980L, 2990L, 3070L, 
+                        3080L, 3095L, 3170L, 3180L, 3190L, 3365L, 3370L, 3380L, 3390L, 
+                        3470L, 3490L, 3570L, 3580L, 3590L, 3670L, 3680L, 3690L, 3770L, 
+                        3780L, 3790L, 3875L, 3895L, 3960L, 3970L, 3980L, 3990L, 4070L, 
+                        4080L, 4090L, 4170L, 4180L, 4195L, 4265L, 4270L, 4280L, 4290L, 
+                        4370L, 4380L, 4390L, 4470L, 4480L, 4490L, 4560L, 4570L, 4580L, 
+                        4585L, 4590L, 4670L, 4680L, 4690L, 4770L, 4780L, 4795L, 4870L, 
+                        4880L, 4890L, 4970L, 4980L, 4990L, 5070L, 5080L, 5090L, 5170L, 
+                        5180L, 5190L, 5275L, 5280L, 5295L, 5370L, 5380L, 5390L, 5470L, 
+                        5480L, 5490L, 5570L, 5580L, 5590L, 5591L, 5592L, 5670L, 5680L, 
+                        5690L, 5790L, 6070L, 6080L, 6090L, 6170L, 6180L, 6190L, 6270L, 
+                        6280L, 6290L, 6370L, 6380L, 6390L, 6470L, 6480L, 6490L, 6570L, 
+                        6590L, 6670L, 6672L, 6680L, 6690L, 6695L, 6770L, 6780L, 6870L, 
+                        6880L, 6890L, 6970L, 6990L, 7070L, 7080L, 7170L, 7180L, 7190L, 
+                        7270L, 7280L, 7290L, 7370L, 7380L, 7390L, 7460L, 7470L, 7480L, 
+                        7490L, 7570L, 7580L, 7590L, 7670L, 7680L, 7690L, 7770L, 7780L, 
+                        7790L, 7860L, 7870L, 7880L, 7890L, 7970L, 7980L, 7990L, 8070L, 
+                        8080L, 8090L, 8170L, 8180L, 8190L, 8270L, 8290L, 8370L, 8380L, 
+                        8390L, 8470L, 8560L, 8570L, 8580L, 8590L, 8660L, 8670L, 8680L, 
+                        8690L, 8770L, 8780L, 8790L, 8870L, 8880L, 8970L, 8980L, 8990L, 
+                        9070L, 9080L, 9090L, 9160L, 9170L, 9180L, 9190L, 9290L, 9370L, 
+                        9380L, 9390L, 9470L, 9480L, 9490L, 9570L, 9590L, 9670L, 9680L, 
+                        9690L, 9770L, 9780L, 9790L, 9870L, 9920L))
+
+ind <-  c(".AGR", ".AGR", ".AGR", ".AGR", ".AGR", ".AGR", ".EXT", ".EXT", ".EXT", 
+          ".EXT", ".EXT", ".UTL", ".UTL", ".UTL", ".UTL", ".UTL", ".UTL", 
+          ".CON", ".MFG", ".MFG", ".MFG", ".MFG", ".MFG", ".MFG", ".MFG", 
+          ".MFG", ".MFG", ".MFG", ".MFG", ".MFG", ".MFG", ".MFG", ".MFG", 
+          ".MFG", ".MFG", ".MFG", ".MFG", ".MFG", ".MFG", ".MFG", ".MFG", 
+          ".MFG", ".MFG", ".MFG", ".MFG", ".MFG", ".MFG", ".MFG", ".MFG", 
+          ".MFG", ".MFG", ".MFG", ".MFG", ".MFG", ".MFG", ".MFG", ".MFG", 
+          ".MFG", ".MFG", ".MFG", ".MFG", ".MFG", ".MFG", ".MFG", ".MFG", 
+          ".MFG", ".MFG", ".MFG", ".MFG", ".MFG", ".MFG", ".MFG", ".MFG", 
+          ".MFG", ".MFG", ".MFG", ".MFG", ".MFG", ".MFG", ".MFG", ".MFG", 
+          ".MFG", ".MFG", ".MFG", ".MFG", ".MFG", ".MFG", ".MFG", ".MFG", 
+          ".MFG", ".MFG", ".MFG", ".MFG", ".MFG", ".MFG", ".MFG", ".MFG", 
+          ".MFG", ".WHL", ".WHL", ".WHL", ".WHL", ".WHL", ".WHL", ".WHL", 
+          ".WHL", ".WHL", ".WHL", ".WHL", ".WHL", ".WHL", ".WHL", ".WHL", 
+          ".WHL", ".WHL", ".WHL", ".WHL", ".WHL", ".WHL", ".RET", ".RET", 
+          ".RET", ".RET", ".RET", ".RET", ".RET", ".RET", ".RET", ".RET", 
+          ".RET", ".RET", ".RET", ".RET", ".RET", ".RET", ".RET", ".RET", 
+          ".RET", ".RET", ".RET", ".RET", ".RET", ".RET", ".RET", ".RET", 
+          ".RET", ".RET", ".RET", ".RET", ".RET", ".RET", ".RET", ".RET", 
+          ".RET", ".RET", ".TRN", ".TRN", ".TRN", ".TRN", ".TRN", ".TRN", 
+          ".TRN", ".TRN", ".TRN", ".TRN", ".TRN", ".TRN", ".INF", ".INF", 
+          ".INF", ".INF", ".INF", ".INF", ".INF", ".INF", ".INF", ".INF", 
+          ".INF", ".INF", ".FIN", ".FIN", ".FIN", ".FIN", ".FIN", ".FIN", 
+          ".FIN", ".FIN", ".FIN", ".FIN", ".PRF", ".PRF", ".PRF", ".PRF", 
+          ".PRF", ".PRF", ".PRF", ".PRF", ".PRF", ".PRF", ".PRF", ".PRF", 
+          ".PRF", ".PRF", ".PRF", ".PRF", ".PRF", ".PRF", ".PRF", ".EDU", 
+          ".EDU", ".EDU", ".EDU", ".MED", ".MED", ".MED", ".MED", ".MED", 
+          ".MED", ".MED", ".MED", ".MED", ".MED", ".MED", ".SCA", ".SCA", 
+          ".SCA", ".SCA", ".ENT", ".ENT", ".ENT", ".ENT", ".ENT", ".ENT", 
+          ".ENT", ".ENT", ".SRV", ".SRV", ".SRV", ".SRV", ".SRV", ".SRV", 
+          ".SRV", ".SRV", ".SRV", ".SRV", ".SRV", ".SRV", ".SRV", ".SRV", 
+          ".SRV", ".SRV", ".ADM", ".ADM", ".ADM", ".ADM", ".ADM", ".ADM", 
+          ".ADM", ".ADM", ".MIL", ".MIL", ".MIL", ".MIL", ".MIL", ".MIL", 
+          ".MIL", ".UNEMPLOYED")
+
+indMap <- data.frame(indCode, ind)
